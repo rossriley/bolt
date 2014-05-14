@@ -129,7 +129,7 @@ class LowlevelChecks
         } else $cfg['path'] = realpath(__DIR__."/../database/");
 
         if (!is_writable($cfg['path'])) {
-            $this->lowlevelError("The folder <code>$cfg['path']</code> doesn't exist or it is not writable. Make sure it's " .
+            $this->lowlevelError("The folder <code>{$cfg['path']}</code> doesn't exist or it is not writable. Make sure it's " .
                 "present and writable to the user that the webserver is using.");
         }
 
