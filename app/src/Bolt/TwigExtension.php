@@ -1053,7 +1053,7 @@ class TwigExtension extends \Twig_Extension
         $image = sprintf(
             "%sfiles/%s",
             $this->app['paths']['root'],
-            safeFilename($filename)
+            ltrim(safeFilename($filename),'files/')
         );
 
         return $image;
