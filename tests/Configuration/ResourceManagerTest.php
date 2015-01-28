@@ -3,12 +3,10 @@ namespace Bolt\Tests\Configuration;
 
 use Bolt\Application;
 use Bolt\Configuration\ResourceManager;
-use Bolt\Configuration\Composer;
 use Bolt\Configuration\Standard;
 use Symfony\Component\HttpFoundation\Request;
 use Eloquent\Pathogen\FileSystem\PlatformFileSystemPath as Path;
 use Eloquent\Pathogen\FileSystem\Factory\PlatformFileSystemPathFactory;
-use Bolt\Configuration\LowlevelException;
 
 /**
  * Class to test correct operation and locations of resource manager class and extensions.
@@ -53,7 +51,7 @@ class ResourceManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider exceptionGetPathProvider
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testExceptionGetPath($path)
     {
@@ -77,6 +75,9 @@ class ResourceManagerTest extends \PHPUnit_Framework_TestCase
             ),
             array(
                 'FAKE_PATH'
+            ),
+            array(
+                'FAKE_PATH/test'
             )
         );
     }
@@ -92,8 +93,10 @@ class ResourceManagerTest extends \PHPUnit_Framework_TestCase
             )
         );
         $this->assertEquals(Path::fromString(TEST_ROOT), $config->getPath('root'));
+        $this->assertEquals(Path::fromString(TEST_ROOT), $config->getPath('rootpath'));
         $this->assertEquals(Path::fromString(TEST_ROOT . '/app'), $config->getPath('app'));
         $this->assertEquals(Path::fromString(TEST_ROOT . '/files'), $config->getPath('files'));
+        $this->assertInstanceOf('Eloquent\Pathogen\PathInterface', $config->getPath('root', true));
     }
     
     public function testRelativePathCreation()
@@ -106,8 +109,8 @@ class ResourceManagerTest extends \PHPUnit_Framework_TestCase
                 )
             )
         );
-        
-        $this->assertEquals(TEST_ROOT.'/app/cache/test', $config->getPath('cache/test'));
+
+        $this->assertEquals(Path::fromString(TEST_ROOT . '/app/cache/test'), $config->getPath('cache/test'));
     }
 
     public function testDefaultUrls()
@@ -130,7 +133,7 @@ class ResourceManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider exceptionGetUrlProvider
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testExceptionGetUrl($url)
     {
@@ -198,7 +201,7 @@ class ResourceManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider exceptionGetRequest
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testExceptionGetRequest($request)
     {
