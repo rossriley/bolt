@@ -13,7 +13,7 @@
 
 namespace Bolt;
 
-use Bolt\Configuration\LowlevelException;
+use Bolt\Exception\LowlevelException;
 
 // Do bootstrapping within a new local scope to avoid polluting the global
 return call_user_func(
@@ -67,7 +67,7 @@ return call_user_func(
         }
 
         // Register a PHP shutdown function to catch fatal error
-        register_shutdown_function(array('\Bolt\Configuration\LowlevelException', 'catchFatalErrors'));
+        register_shutdown_function(array('\Bolt\Exception\LowlevelException', 'catchFatalErrors'));
 
         /**
          * @var $config Configuration\ResourceManager
