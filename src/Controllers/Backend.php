@@ -759,8 +759,11 @@ class Backend implements ControllerProviderInterface
 
             // To check whether the status is allowed, we act as if a status
             // *transition* were requested.
+            echo "SET FROM POST \n";
             $content->setFromPost($requestAll, $contenttype);
+            $oldcontent = $content;
             $newStatus = $content['status'];
+
 
             // Don't try to spoof the $id.
             if (!empty($content['id']) && $id != $content['id']) {
@@ -777,6 +780,7 @@ class Backend implements ControllerProviderInterface
 
                 // Save the record
                 $id = $app['storage']->saveContent($content, $comment);
+
 
                 // Log the change
                 if ($new) {
@@ -845,6 +849,9 @@ class Backend implements ControllerProviderInterface
                                     break;
                             }
                         }
+
+                        $val['requestAll'] = $requestAll;
+                        $val['oldContent'] = $content;
 
                         // unset flashbag for ajax
                         $app['session']->getFlashBag()->clear('success');
@@ -943,6 +950,7 @@ class Backend implements ControllerProviderInterface
         $hasRelations = isset($contenttype['relations']);
         $hasTabs = $contenttype['groups'] !== false;
         $hasTaxonomy = isset($contenttype['taxonomy']);
+        $hasTemplateFields = $content->populateTemplateFieldsContenttype();
 
         // Generate tab groups
         $groups = array();
@@ -977,6 +985,10 @@ class Backend implements ControllerProviderInterface
         if ($hasTaxonomy || (is_array($contenttype['groups']) && in_array('taxonomy', $contenttype['groups']))) {
             $addGroup('taxonomy', Trans::__('contenttypes.generic.group.taxonomy'));
         }
+
+
+
+
         $addGroup('meta', Trans::__('contenttypes.generic.group.meta'));
 
         // Render
@@ -994,6 +1006,7 @@ class Backend implements ControllerProviderInterface
                 'relations'          => $hasRelations,
                 'tabs'               => $hasTabs,
                 'taxonomy'           => $hasTaxonomy,
+                'templatefields'     => $hasTemplateFields,
             ),
         );
 
