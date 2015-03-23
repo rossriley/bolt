@@ -377,6 +377,9 @@ class Config
         if (!isset($contentType['viewless'])) {
             $contentType['viewless'] = false;
         }
+        if (!isset($contentType['templatefields'])) {
+            $contentType['templatefields'] = true;
+        }
 
         list($fields, $groups) = $this->parseFieldsAndGroups($contentType['fields'], $acceptableFileTypes);
         $contentType['fields'] = $fields;

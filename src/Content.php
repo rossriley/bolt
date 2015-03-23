@@ -534,7 +534,7 @@ class Content implements \ArrayAccess
 
     public function hasTemplateFields() {
         if (is_array($this->contenttype)) {
-            if ((!$this->contenttype['viewless']) && (!empty($this['templatefields'])) && ($templateFieldsConfig = $this->app['config']->get('theme/templatefields'))) {
+            if ((!$this->contenttype['templatefields']) && (!empty($this['templatefields'])) && ($templateFieldsConfig = $this->app['config']->get('theme/templatefields'))) {
                 $template = $this->app['templatechooser']->record($this);
                 if (array_key_exists($template, $templateFieldsConfig)) {
                     return true;
