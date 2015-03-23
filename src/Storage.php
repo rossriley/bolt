@@ -1307,7 +1307,9 @@ class Storage
             }
         }
 
-        if (!isset($metaParameters['limit'])) {
+        if ($decoded['return_single']) {
+            $metaParameters['limit'] = 1;
+        } elseif (!isset($metaParameters['limit'])) {
             $metaParameters['limit'] = 9999;
         }
     }
@@ -1466,7 +1468,7 @@ class Storage
                                 in_array($keyParts[$i], Content::getBaseColumns())) {
                                 $rkey = $tablename . '.' . $keyParts[$i];
                                 $fieldtype = $this->getContentTypeFieldType($contenttype['slug'], $keyParts[$i]);
-                                $orPart .= ' (' . $this->parseWhereParameter($rkey, $valParts[$i], $keyParts[$i], $fieldtype) . ') OR ';
+                                $orPart .= ' (' . $this->parseWhereParameter($rkey, $valParts[$i], $fieldtype) . ') OR ';
                             }
                         }
                         if (strlen($orPart) > 2) {
@@ -1511,8 +1513,7 @@ class Storage
             }
 
             if (count($order) == 0) {
-                // we didn't add table, maybe this is an issue
-                $order[] = 'datepublish DESC';
+                $order[] = $this->decodeQueryOrder($contenttype, false) ?: 'datepublish DESC';
             }
 
             if (count($where) > 0) {
@@ -1628,7 +1629,7 @@ class Storage
      *
      * @return array
      */
-    private function executeGetContentSearch($decoded, $parameters)
+    protected function executeGetContentSearch($decoded, $parameters)
     {
         $results = $this->searchContent(
             $parameters['filter'],
@@ -1654,7 +1655,7 @@ class Storage
      *
      * @return array
      */
-    private function executeGetContentQueries($decoded)
+    protected function executeGetContentQueries($decoded)
     {
         // Perform actual queries and hydrate
         $totalResults = false;
@@ -1749,6 +1750,12 @@ class Storage
             $parameters = array_merge((array) $parameters, (array) $whereparameters);
         }
 
+        $logNotFound = true;
+        if (isset($parameters['log_not_found'])) {
+            $logNotFound = $parameters['log_not_found'];
+            unset($parameters['log_not_found']);
+        }
+
         // Decode this textquery
         $decoded = $this->decodeContentQuery($textquery, $parameters);
         if ($decoded === false) {
@@ -1800,11 +1807,13 @@ class Storage
                 return util::array_first($results);
             }
 
-            $msg = sprintf(
-                "Requested specific query '%s', not found.",
-                $textquery
-            );
-            $this->app['logger.system']->error($msg, array('event' => 'storage'));
+            if ($logNotFound) {
+                $msg = sprintf(
+                    "Requested specific query '%s', not found.",
+                    $textquery
+                );
+                $this->app['logger.system']->error($msg, array('event' => 'storage'));
+            }
             $this->app['stopwatch']->stop('bolt.getcontent');
 
             return false;
@@ -2369,6 +2378,20 @@ class Storage
                 }
             }
 
+            // Convert new slugs to lowercase to compare in the delete process
+            $newSlugsNormalised = array();
+            foreach($newslugs as $slug) {
+                // If it's like 'desktop#10', split it into value and sortorder.
+                list($slug, $sortorder) = explode('#', $slug . "#");
+                $slug = $this->app['slugify']->slugify($slug);
+
+                if (!empty($sortorder)) {
+                    $slug = $slug . '#' . $sortorder;
+                }
+
+                $newSlugsNormalised[] = $slug;
+            }
+
             // Delete the ones that have been removed.
             foreach ($currentvalues as $id => $slug) {
 
@@ -2376,7 +2399,7 @@ class Storage
                 $valuewithorder = $slug . "#" . $currentsortorder;
                 $slugkey = '/' . $configTaxonomies[$taxonomytype]['slug'] . '/' . $slug;
 
-                if (!in_array($slug, $newslugs) && !in_array($valuewithorder, $newslugs) && !array_key_exists($slugkey, $newslugs)) {
+                if (!in_array($slug, $newSlugsNormalised) && !in_array($valuewithorder, $newSlugsNormalised) && !array_key_exists($slugkey, $newSlugsNormalised)) {
                     $this->app['db']->delete($tablename, array('id' => $id));
                 }
             }
@@ -2677,7 +2700,7 @@ class Storage
      *
      * @return mixed
      */
-    protected function getTablename($name)
+    public function getTablename($name)
     {
         $name = str_replace("-", "_", $this->app['slugify']->slugify($name));
         $tablename = sprintf("%s%s", $this->prefix, $name);
