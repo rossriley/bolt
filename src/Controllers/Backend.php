@@ -918,7 +918,7 @@ class Backend implements ControllerProviderInterface
             $content->setValue('datechanged', '');
             $content->setValue('username', '');
             $content->setValue('ownerid', '');
-            $content->setValue('templatefields', array());
+            // $content->setValue('templatefields', array());
             $app['session']->getFlashBag()->add('info', Trans::__('contenttypes.generic.duplicated-finalize', array('%contenttype%' => $contenttype['slug'])));
         }
 
@@ -945,12 +945,27 @@ class Backend implements ControllerProviderInterface
             }
         }
 
+        if (!empty($content['templatefields'])) {
+            foreach ($content['templatefields']->contenttype['fields'] as $key => &$values) {
+                if (isset($values['upload'])) {
+                    $canUpload = $app['filesystem']->getFilesystem()->getVisibility($values['upload']);
+                    if ($canUpload === 'public') {
+                        $values['canUpload'] = true;
+                    } else {
+                        $values['canUpload'] = false;
+                    }
+                } else {
+                    $values['canUpload'] = true;
+                }
+            }
+        }
+
         // Info
         $hasIncomingRelations = is_array($content->relation);
         $hasRelations = isset($contenttype['relations']);
         $hasTabs = $contenttype['groups'] !== false;
         $hasTaxonomy = isset($contenttype['taxonomy']);
-        $hasTemplateFields = $content->populateTemplateFieldsContenttype();
+        $hasTemplateFields = $content->hasTemplateFields();
 
         // Generate tab groups
         $groups = array();
