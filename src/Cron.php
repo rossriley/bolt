@@ -36,7 +36,7 @@ class Cron extends Event
     private $param;
 
     /** @var array The next elegible run time for each interim. */
-    private $jobs;
+    public $jobs;
 
     /** @var boolean True for a required database insert. */
     private $insert;
@@ -49,6 +49,9 @@ class Cron extends Event
 
     /** @var string */
     private $cronHour;
+    
+    /** @var string */
+    protected $repository;
 
     /** @var array */
     public $lastruns = [];
@@ -64,6 +67,9 @@ class Cron extends Event
         $this->output = $output;
         $this->param = $param;
         $this->runtime = time();
+        
+        // This should be directly injected, but use the app container while still available
+        $this->repository = $app['storage']->getRepository('Bolt\Entity\Cron');
 
         $this->jobs = [
             CronEvents::CRON_HOURLY  => ['nextRunTime' => 0, 'message' => 'Running Cron Hourly Jobs'],
@@ -204,16 +210,8 @@ class Cron extends Event
     private function getNextRunTimes()
     {
         foreach (array_keys($this->jobs) as $interim) {
-            // Handle old style naming
-            $oldname = strtolower(str_replace('cron.', '', $interim));
 
-            $query =
-                "SELECT lastrun, interim " .
-                "FROM {$this->tablename} " .
-                "WHERE (interim = :interim OR interim = :oldname) " .
-                "ORDER BY lastrun DESC";
-
-            $result = $this->app['db']->fetchAssoc($query, ['interim' => $interim, 'oldname' => $oldname]);
+            $result = $this->repository->getNextRunTimes($interim);
 
             // If we get an empty result for the interim, set it to the current
             // run time and notify the update method to do an INSERT rather than
