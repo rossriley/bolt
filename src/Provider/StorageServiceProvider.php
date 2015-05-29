@@ -27,6 +27,7 @@ class StorageServiceProvider implements ServiceProviderInterface
                     $app['logger.system']
                 );
                 $storage->setLegacyStorage($app['storage.legacy']);
+                $storage->setRepository('Bolt\Entity\Cron', 'Bolt\Storage\Repository\CronRepository');
 
                 return $storage;
             }
