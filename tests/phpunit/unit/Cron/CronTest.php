@@ -3,6 +3,8 @@ namespace Bolt\Tests\Cron;
 
 use Bolt\Cron;
 use Bolt\Tests\BoltUnitTest;
+use Symfony\Component\Console\Output\BufferedOutput;
+
 
 /**
  * Class to test src/Field/Base.
@@ -13,7 +15,15 @@ class CronTest extends BoltUnitTest
 {
     public function testConstruct()
     {
-        $app = $this->getApp();
-        $cron = new Cron($app);
+        $app = $this->getApp();        
+        $output = new BufferedOutput();
+        
+        $cron = new Cron($app, $output);
+        $cron->execute();
+        
+        $result = $output->fetch();
+        
+        var_dump($output);
+
     }
 }
