@@ -36,7 +36,7 @@ class Cron extends Event
     private $param;
 
     /** @var array The next elegible run time for each interim. */
-    public $jobs;
+    private $jobs;
 
     /** @var boolean True for a required database insert. */
     private $insert;
