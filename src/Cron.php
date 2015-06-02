@@ -223,7 +223,8 @@ class Cron extends Event
                 $this->jobs[$interim]['nextRunTime'] = $this->getNextIterimRunTime($interim, $result['lastrun']);
 
                 // @TODO remove this in v3.0
-                // Update old record types
+                // This handles the case where an interval is not prefixed with the 
+                // cron. namespace eg: Daily instead of cron.Daily
                 $oldname = strtolower(str_replace('cron.', '', $interim));
                 if ($result['interim'] == $oldname) {
                     $this->insert[$interim] = true;
