@@ -41,7 +41,9 @@ class Hydrator
     {
         $classname = $this->handler;
         $entity = new $classname;
-        $entity->setContenttype($this->metadata->getBoltName());
+        if ($this->metadata->getBoltName()) {
+            $entity->setContenttype($this->metadata->getBoltName());
+        }
 
         foreach ($this->metadata->getFieldMappings() as $key => $mapping) {
             // First step is to allow each Bolt field to transform the data.
