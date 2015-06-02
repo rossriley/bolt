@@ -10,6 +10,12 @@ class CronRepository extends Repository
 {
 
  
+    /**
+     * Fetches the next run time for a named interval eg: cron.Hourly | cron.Daily
+     *
+     * @param $interimName 
+     * @return Bolt\Entity\Cron
+     **/
     public function getNextRunTimes($interimName)
     {
         $query = $this->queryNextRunTimes($interimName);
