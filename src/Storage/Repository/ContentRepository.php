@@ -1,7 +1,7 @@
 <?php
 namespace Bolt\Storage\Repository;
 
-use Bolt\Entity\Content;
+use Bolt\Storage\Repository;
 
 /**
  * A Repository class that handles dynamically created content tables.
@@ -31,6 +31,7 @@ class ContentRepository extends Repository
      */
     public function create($params = null)
     {
-        return new Content($params);
+        $entityClass = $this->getClassName();
+        return new $entityClass($params);
     }
 }
