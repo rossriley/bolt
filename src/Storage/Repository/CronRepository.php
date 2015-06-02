@@ -13,14 +13,14 @@ class CronRepository extends Repository
     public function getNextRunTimes($interimName)
     {
         $query = $this->queryNextRunTimes($interimName);
-        return $query->execute()->fetchAll();
+        return $this->findWith($query);
     }
     
     public function queryNextRunTimes($interimName)
     {
         $oldname = strtolower(str_replace('cron.', '', $interimName));
         $qb = $this->createQueryBuilder();
-        $qb->select('lastrun, interim')
+        $qb->select('id, lastrun, interim')
             ->where('(interim = :interim OR interim = :oldname)')
             ->orderBy('lastrun', 'DESC')
             ->setParameter('interim', $interimName)
