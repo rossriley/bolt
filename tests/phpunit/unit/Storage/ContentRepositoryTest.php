@@ -19,8 +19,8 @@ class ContentRepositoryTest extends BoltUnitTest
         $app = $this->getApp();
         $em = new EntityManager($app['db'], $app['dispatcher'], $app['storage.metadata']);
         $repo = $em->getRepository('bolt_showcases');
-
-        $this->assertInstanceOf('Bolt\Storage\ContentRepository', $repo);
+        
+        $this->assertInstanceOf('Bolt\Storage\Repository\ContentRepository', $repo);
     }
 
     public function testCreate()
