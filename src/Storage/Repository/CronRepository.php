@@ -13,7 +13,7 @@ class CronRepository extends Repository
     public function getNextRunTimes($interimName)
     {
         $query = $this->queryNextRunTimes($interimName);
-        return $this->findWith($query);
+        return $this->findOneWith($query);
     }
     
     public function queryNextRunTimes($interimName)
