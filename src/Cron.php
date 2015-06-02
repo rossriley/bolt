@@ -224,6 +224,7 @@ class Cron extends Event
 
                 // @TODO remove this in v3.0
                 // Update old record types
+                $oldname = strtolower(str_replace('cron.', '', $interim));
                 if ($result['interim'] == $oldname) {
                     $this->insert[$interim] = true;
                 } else {
