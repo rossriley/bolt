@@ -36,7 +36,7 @@ class Cron extends Event
     private $param;
 
     /** @var array The next elegible run time for each interim. */
-    private $jobs;
+    public $jobs;
 
     /** @var boolean True for a required database insert. */
     private $insert;
@@ -239,7 +239,7 @@ class Cron extends Event
      * Get the next run time for a given interim.
      *
      * @param string $interim     The interim; CRON_HOURLY, CRON_DAILY, CRON_WEEKLY, CRON_MONTHLY or CRON_YEARLY
-     * @param string $lastRunTime The last execution time of the interim
+     * @param DateTime $lastRunTime The last execution time of the interim
      *
      * @return integer The UNIX timestamp for the interims next valid execution time
      */

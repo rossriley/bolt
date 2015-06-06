@@ -29,5 +29,19 @@ class CronTest extends BoltUnitTest
         $this->assertEquals("Running Cron Monthly Jobs", $result[5]);
         $this->assertEquals("Running Cron Yearly Jobs", $result[6]);
         
+        // Now test that the interval times are in the DB
+        $repo = $app['storage']->getRepository('Bolt\Entity\Cron');
+        $results = $repo->getNextRunTimes('cron.Hourly');
+        print_r($results);
+        
+        print_r($cron->jobs);
+        
+    }
+    
+    public function testSecondRun()
+    {
+        $app = $this->getApp();        
+        $output = new BufferedOutput();
+        $cron = new Cron($app, $output);
     }
 }
