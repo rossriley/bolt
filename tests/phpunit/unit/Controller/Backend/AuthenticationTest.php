@@ -167,7 +167,7 @@ class AuthenticationTest extends ControllerUnitTest
         $passwordMock->expects($this->once())
             ->method('resetPasswordConfirm')
             ->will($this->returnValue(true));
-        $this->setService('authentication', $passwordMock);
+        $this->setService('authentication.password', $passwordMock);
 
         $this->setRequest(Request::create('/bolt/resetpassword'));
 
