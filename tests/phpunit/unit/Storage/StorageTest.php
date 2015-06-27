@@ -227,26 +227,63 @@ class StorageTest extends BoltUnitTest
 
     public function testGetSortOrder()
     {
+        $app = $this->getApp();
+        $storage = $app['storage'];
+        
+        // First test that non-string returns false
+        $this->assertFalse($storage->getSortOrder([]));
+
+        // Test that default returns datepublish
+        $this->assertEquals(['datepublish', false], $storage->getSortOrder());
+        $this->assertEquals(['datepublish', true], $storage->getSortOrder('datepublish'));
+        $this->assertEquals(['datepublish', true], $storage->getSortOrder('datepublish ASC'));
+        $this->assertEquals(['datepublish', false], $storage->getSortOrder('datepublish DESC'));
+        
     }
 
     public function testGetContentType()
     {
+        $app = $this->getApp();
+        $storage = $app['storage'];
+        
+        $this->assertEquals($app['config']->get('contenttypes/showcases'), $storage->getContentType('showcases'));
+        
+        // Change the name and make sure this gets picked up too..
+        $app['config']->set('contenttypes/showcases/name', 'Different');
+        $this->assertEquals($app['config']->get('contenttypes/showcases'), $storage->getContentType('Different'));
+        $this->assertFalse($storage->getContentType(''));
+        $this->assertFalse($storage->getContentType('nonexistent'));
     }
 
     public function testGetTaxonomyType()
     {
+        $app = $this->getApp();
+        $this->assertFalse($app['storage']->getTaxonomyType(''));
+        $this->assertFalse($app['storage']->getTaxonomyType('nonexistent'));
+        $this->assertEquals($app['config']->get('taxonomy/categories'), $app['storage']->getTaxonomyType('categories'));
+        $this->assertEquals($app['config']->get('taxonomy/categories'), $app['storage']->getTaxonomyType('category'));
     }
 
     public function testGetContentTypes()
     {
+        $app = $this->getApp();
+        $this->assertTrue(is_array($app['storage']->getContentTypes()));
     }
 
     public function testGetContentTypeFields()
     {
+        $app = $this->getApp();
+        $this->assertTrue(is_array($app['storage']->getContentTypeFields('showcases')));
+        $app['config']->set('contenttypes/showcases/fields', '');
+        $this->assertEquals([], $app['storage']->getContentTypeFields('showcases'));
     }
 
     public function testGetContentTypeFieldType()
     {
+        $app = $this->getApp();
+        $type = $app['storage']->getContentTypeFieldType('showcases', 'title');
+        $this->assertEquals('text', $app['storage']->getContentTypeFieldType('showcases', 'title'));
+        $this->assertEquals('datetime', $app['storage']->getContentTypeFieldType('showcases', 'datepublish'));
     }
 
     public function testGetContentTypeGrouping()
