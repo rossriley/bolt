@@ -1134,7 +1134,7 @@ class Storage
         $metaParameters = [];
         if (is_array($inParameters)) {
             foreach ($inParameters as $key => $value) {
-                if (in_array($key, ['page', 'limit', 'offset', 'returnsingle', 'printquery', 'paging', 'order'])) {
+                if (in_array($key, ['page', 'limit', 'offset', 'returnsingle', 'printquery', 'paging', 'order', 'getquery'])) {
                     $metaParameters[$key] = $value;
                 } else {
                     $ctypeParameters[$key] = $value;
@@ -1716,6 +1716,10 @@ class Storage
             if (!empty($decoded['parameters']['printquery'])) {
                 // @todo formalize this
                 echo nl2br(htmlentities($statement));
+            }
+            
+            if (is_callable($decoded['parameters']['getquery'])) {
+                call_user_func($decoded['parameters']['getquery'], $statement, $query['params']);
             }
 
             $rows = $this->app['db']->fetchAll($statement, $query['params']);
