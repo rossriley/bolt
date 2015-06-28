@@ -93,11 +93,7 @@ class StorageTest extends BoltUnitTest
         $app['request'] = Request::create('/');
         $storage = new Storage($app);
 
-        // Test delete fails on missing params
-        $this->setExpectedException('Bolt\Exception\StorageException', 'Contenttype is required for deleteContent');
-        $this->assertFalse($storage->deleteContent('', 999));
-
-        $content = $storage->getContent('showcases/1');
+        $content = $app['storage']->getContent('showcases/1');
 
         // Test the delete events are triggered
         $delete = 0;
@@ -107,10 +103,21 @@ class StorageTest extends BoltUnitTest
         $app['dispatcher']->addListener(StorageEvents::PRE_DELETE, $listener);
         $app['dispatcher']->addListener(StorageEvents::POST_DELETE, $listener);
 
-        $storage->deleteContent(['slug' => 'showcases'], 1);
+        $app['storage']->deleteContent(['slug' => 'showcases'], 1);
 
         $this->assertFalse($storage->getContent('showcases/1'));
         $this->assertEquals(2, $delete);
+    }
+    
+    public function testDeleteContentException()
+    {
+        $app = $this->getApp();
+        $app['request'] = Request::create('/');
+        $storage = new Storage($app);
+
+        // Test delete fails on missing params
+        $this->setExpectedException('Bolt\Exception\StorageException', 'Contenttype is required for deleteContent');
+        $this->assertFalse($storage->deleteContent('', 999));
     }
 
     public function testUpdateSingleValue()
@@ -165,11 +172,22 @@ class StorageTest extends BoltUnitTest
         $app = $this->getApp();
         $app['request'] = Request::create('/');
         $storage = new Storage($app);
-        $results = $storage->searchAllContentTypes(['title' => 'lorem']);
+        $results = $app['storage']->searchAllContentTypes(['body' => 'lorem']);
+        $this->assertTrue(is_array($results));
     }
 
     public function testSearchContentType()
     {
+        $app = $this->getApp();
+        $pager = [];
+        $results = $app['storage']->searchContentType('pages', ['body' => 'lorem']);
+        $this->assertTrue(is_array($results));
+        $this->assertEmpty($results);
+        
+        $this->markTestSkipped('Storage searchContentType fails with string filter');
+        $results = $app['storage']->searchContentType('pages', ['filter' => 'lorem', 'limit'=>1]);
+        $this->assertEquals(1, count($results));
+        
     }
 
     public function testGetContentByTaxonomy()
@@ -184,8 +202,45 @@ class StorageTest extends BoltUnitTest
     {
     }
 
-    public function testGetContent()
+    /**
+     *
+     * @dataProvider validContentQueryProvider
+     */
+    public function testGetContent($query, $params, $expected)
     {
+        $app = $this->getApp();
+        $app['request'] = Request::create('/');
+        $params['getquery'] = function($query, $params) use ($expected) {
+            $this->assertEquals($expected, $query);
+        };
+        $app['storage']->getContent($query, $params);
+    }
+    
+    public static function validContentQueryProvider()
+    {
+        return [
+            [
+                'pages', 
+                [], 
+                "SELECT bolt_pages.* FROM bolt_pages  ORDER BY datepublish DESC LIMIT 9999"
+            ],
+            [
+                'pages/1', 
+                [], 
+                "SELECT bolt_pages.* FROM bolt_pages WHERE (\"bolt_pages\".\"id\" = '1') ORDER BY datepublish DESC LIMIT 1"
+            ],
+            [
+                'pages/latest/2', 
+                [], 
+                'SELECT bolt_pages.* FROM bolt_pages  ORDER BY "datepublish" DESC LIMIT 2'
+            ],
+            [
+                'pages/first/2', 
+                [], 
+                'SELECT bolt_pages.* FROM bolt_pages  ORDER BY "datepublish" LIMIT 2'
+            ],
+            
+        ];
     }
 
     public function testGetContentSortOrderFromContentType()
@@ -288,18 +343,31 @@ class StorageTest extends BoltUnitTest
 
     public function testGetContentTypeGrouping()
     {
+        $app = $this->getApp();
+        $this->assertEquals('chapters', $app['storage']->getContentTypeGrouping('pages'));
     }
 
     public function testGetContentTypeTaxonomy()
     {
+        $app = $this->getApp();
+        $expected = ['chapters'=>$app['config']->get('taxonomy/chapters')];
+        $this->assertEquals($expected, $app['storage']->getContentTypeTaxonomy('pages'));
+        $this->assertEquals([], $app['storage']->getContentTypeTaxonomy('nonexistent'));
     }
 
     public function testGetLatestId()
     {
+        $app = $this->getApp();
+        $this->assertEquals('5', $app['storage']->getLatestId('pages'));
     }
 
     public function testGetUri()
     {
+        $app = $this->getApp();
+        $this->assertEquals('/page/this-is-a-test', $app['storage']->getUri('This is a test', 1, 'pages'));
+        $this->assertEquals('/page/page-100', $app['storage']->getUri('100', 1, 'pages'));
+        $this->assertEquals('/page/page-100', $app['storage']->getUri('100', 1, 'pages', true, true, 'title'));
+        $this->assertEquals('/page/page-100', $app['storage']->getUri('100', 1, 'pages', true, true, 'nonexistent'));
     }
 
     public function testSetPager()
