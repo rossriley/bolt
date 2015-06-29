@@ -176,6 +176,7 @@ class StorageTest extends BoltUnitTest
         $this->assertTrue(is_array($results));
     }
 
+    
     public function testSearchContentType()
     {
         $app = $this->getApp();
@@ -206,13 +207,14 @@ class StorageTest extends BoltUnitTest
      *
      * @dataProvider validContentQueryProvider
      */
-    public function testGetContent($query, $params, $expected)
+    public function testGetContent($query, $params, $expected, $expectedParams = [])
     {
         $app = $this->getApp();
         $app['request'] = Request::create('/');
         $params['getquery'] = function($query, $params) use ($expected) {
             $this->assertEquals($expected, $query);
         };
+
         $app['storage']->getContent($query, $params);
     }
     
@@ -238,6 +240,71 @@ class StorageTest extends BoltUnitTest
                 'pages/first/2', 
                 [], 
                 'SELECT bolt_pages.* FROM bolt_pages  ORDER BY "datepublish" LIMIT 2'
+            ],
+            [
+                'pages/ecce-aliud-simile-dissimile',
+                [],
+                "SELECT bolt_pages.* FROM bolt_pages WHERE (\"bolt_pages\".\"slug\" = 'ecce-aliud-simile-dissimile') ORDER BY datepublish DESC LIMIT 1"
+            ],
+            [
+                'pages', 
+                ['ownerid'=>2], 
+                "SELECT bolt_pages.* FROM bolt_pages WHERE (\"bolt_pages\".\"ownerid\" = '2') ORDER BY datepublish DESC LIMIT 9999"
+            ],
+            [
+                'pages', 
+                ['datepublish'=>'2015-01-01'], 
+                "SELECT bolt_pages.* FROM bolt_pages WHERE (\"bolt_pages\".\"datepublish\" = '2015-01-01 00:00:00') ORDER BY datepublish DESC LIMIT 9999"
+            ],
+            [
+                'pages', 
+                ['ownerid'=>'!2'], 
+                "SELECT bolt_pages.* FROM bolt_pages WHERE (\"bolt_pages\".\"ownerid\" != '2') ORDER BY datepublish DESC LIMIT 9999"
+            ],
+            [
+                'pages', 
+                ['title'=>'!'], 
+                "SELECT bolt_pages.* FROM bolt_pages WHERE (\"bolt_pages\".\"title\" != '') ORDER BY datepublish DESC LIMIT 9999"
+            ],
+            [
+                'pages', 
+                ['datepublish'=>'<2015-01-01'], 
+                "SELECT bolt_pages.* FROM bolt_pages WHERE (\"bolt_pages\".\"datepublish\" < '2015-01-01 00:00:00') ORDER BY datepublish DESC LIMIT 9999"
+            ],
+            [
+                'pages', 
+                ['status'=>'published','datepublish'=> '< last monday'], 
+                "SELECT bolt_pages.* FROM bolt_pages WHERE (\"bolt_pages\".\"status\" = 'published' AND \"bolt_pages\".\"datepublish\" < '".date('Y-m-d', strtotime('last monday'))." 00:00:00') ORDER BY datepublish DESC LIMIT 9999"
+            ],
+            [
+                'pages', 
+                ['ownerid'=>'>1'], 
+                "SELECT bolt_pages.* FROM bolt_pages WHERE (\"bolt_pages\".\"ownerid\" > '1') ORDER BY datepublish DESC LIMIT 9999"
+            ],
+            [
+                'pages', 
+                ['title'=>'%Ecce%'], 
+                "SELECT bolt_pages.* FROM bolt_pages WHERE (\"bolt_pages\".\"title\" LIKE '%Ecce%') ORDER BY datepublish DESC LIMIT 9999"
+            ],
+            [
+                'entries', 
+                ['categories'=>'news'], 
+                "SELECT bolt_entries.* FROM bolt_entries WHERE (\"id\"  IN (SELECT content_id AS id FROM bolt_taxonomy where \"bolt_taxonomy\".\"taxonomytype\" = 'categories' AND ( \"bolt_taxonomy\".\"slug\" = 'news' OR \"bolt_taxonomy\".\"name\" = 'news' ) AND \"bolt_taxonomy\".\"contenttype\" = 'entries')) ORDER BY \"datepublish\" DESC LIMIT 9999"
+            ],
+            [
+                'entries', 
+                ['categories'=>'news || events'], 
+                "SELECT bolt_entries.* FROM bolt_entries WHERE (\"id\"  IN (SELECT content_id AS id FROM bolt_taxonomy where \"bolt_taxonomy\".\"taxonomytype\" = 'categories' AND ( ( \"bolt_taxonomy\".\"slug\" = 'news' OR \"bolt_taxonomy\".\"slug\" = 'events' ) OR ( \"bolt_taxonomy\".\"name\" = 'news' OR \"bolt_taxonomy\".\"name\" = 'events' ) ) AND \"bolt_taxonomy\".\"contenttype\" = 'entries')) ORDER BY \"datepublish\" DESC LIMIT 9999"
+            ],
+            [
+                'pages', 
+                ['title ||| teaser'=>'%Ecce% ||| %lorem%'], 
+                "SELECT bolt_pages.* FROM bolt_pages WHERE ((  (\"bolt_pages\".\"title\" LIKE '%Ecce%') OR  (\"bolt_pages\".\"teaser\" LIKE '%lorem%')) ) ORDER BY datepublish DESC LIMIT 9999"
+            ],
+            [
+                'pages', 
+                ['limit'=>'5'], 
+                "SELECT bolt_pages.* FROM bolt_pages  ORDER BY datepublish DESC LIMIT 5"
             ],
             
         ];
