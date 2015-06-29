@@ -1718,6 +1718,7 @@ class Storage
                 echo nl2br(htmlentities($statement));
             }
             
+            // Internal use only will be deprecated in next major version
             if (is_callable($decoded['parameters']['getquery'])) {
                 call_user_func($decoded['parameters']['getquery'], $statement, $query['params']);
             }
