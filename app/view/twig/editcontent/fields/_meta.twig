@@ -12,13 +12,13 @@
     publish: {
         disabled: (not context.can.publish),
         id:       'datepublish',
-        value:    context.values.datepublish,
+        value:    context.values.datepublish|date('Y-m-d H:i:s'),
     },
 
     depublish: {
         disabled:  (not context.can.depublish),
         id:        'datedepublish',
-        value:     context.values.datedepublish,
+        value:     context.values.datedepublish|date('Y-m-d H:i:s'),
         notice:     __('Depublish date is in the past. Change the status if you want to depublish now'),
     },
 
