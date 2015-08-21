@@ -64,4 +64,9 @@ class Content extends Entity
         $this->_legacy = $service;
         $this->_legacy->initialize($this);
     }
+    
+    public function get($key)
+    {
+        return $this->$key;
+    }
 }
