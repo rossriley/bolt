@@ -193,6 +193,9 @@ class QueryParameterParser
      */
     public function defaultFilterHandler($key, $value, $expr)
     {
+        if ($value == null) {
+            return;
+        }
         $val = $this->parseValue($value);
         $placeholder = $key.'_1';
         $exprMethod = $val['operator'];

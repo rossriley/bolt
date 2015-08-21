@@ -180,6 +180,10 @@ class ContentQueryParser
         }
 
         foreach ($this->params as $key => $value) {
+            if ($value === null) {
+                unset($this->params[$key]);
+                continue;
+            }
             if ($this->hasDirectiveHandler($key)) {
                 $this->directives[$key] = $value;
                 unset($this->params[$key]);
