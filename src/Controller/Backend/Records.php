@@ -106,7 +106,7 @@ class Records extends BackendBase
         if ($new) {
             $content = $this->app['storage']->getEmptyContent($contenttypeslug);
         } else {
-            $content = $this->getContent($contenttypeslug, ['id' => $id]);
+            $content = $this->getContent($contenttypeslug, ['id' => $id, 'returnsingle'=>true]);
 
             if (empty($content)) {
                 // Record not found, advise and redirect to the dashboard
