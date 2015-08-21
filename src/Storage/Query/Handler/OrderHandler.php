@@ -17,7 +17,7 @@ class OrderHandler
      */
     public function __invoke(QueryInterface $query, $order)
     {
-        if ($order === null) {
+        if (empty($order)) {
             return;
         }
         if (strpos($order, '-') === 0) {
