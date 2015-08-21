@@ -67,6 +67,11 @@ class Content extends Entity
     
     public function get($key)
     {
-        return $this->$key;
+        $val = $this->$key;
+        if ($val instanceof \DateTime) {
+            return $val->format("Y-m-d H:i:s");
+        }
+        
+        return $val;
     }
 }
