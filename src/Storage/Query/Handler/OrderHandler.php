@@ -17,6 +17,9 @@ class OrderHandler
      */
     public function __invoke(QueryInterface $query, $order)
     {
+        if ($order === null) {
+            return;
+        }
         if (strpos($order, '-') === 0) {
             $direction = 'DESC';
             $order = substr($order, 1);
