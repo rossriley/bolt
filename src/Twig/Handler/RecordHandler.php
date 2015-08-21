@@ -174,7 +174,7 @@ class RecordHandler
      *
      * @return string
      */
-    public function listContent($contenttype, $relationoptions, Content $content)
+    public function listContent($contenttype, $relationoptions, $content)
     {
         // Just the relations for the current record, and just the current $contenttype.
         $current = isset($content->relation[$contenttype]) ? $content->relation[$contenttype] : null;
