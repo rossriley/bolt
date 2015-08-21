@@ -3,7 +3,7 @@
 namespace Bolt\Storage;
 
 use Bolt\Application;
-use Bolt\Legacy\Content;
+use Bolt\Storage\Entity\Content;
 use Bolt\Translation\Translator as Trans;
 use Cocur\Slugify\Slugify;
 use Symfony\Component\HttpFoundation\JsonResponse;
