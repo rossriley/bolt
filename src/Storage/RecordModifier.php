@@ -99,7 +99,7 @@ class RecordModifier
      *
      * @return Response
      */
-    private function saveContentRecord(Content $content, array $contenttype, $new, $comment, $returnTo, $editReferrer)
+    private function saveContentRecord($content, array $contenttype, $new, $comment, $returnTo, $editReferrer)
     {
         // Save the record
         $id = $this->app['storage']->saveContent($content, $comment);
@@ -368,7 +368,7 @@ class RecordModifier
      *
      * @return array
      */
-    private function getTempateFieldTemplates(array $contenttype, Content $content)
+    private function getTempateFieldTemplates(array $contenttype, $content)
     {
         $templateFieldTemplates = [];
         $templateFieldsConfig = $this->app['config']->get('theme/templatefields');
@@ -487,7 +487,7 @@ class RecordModifier
      *
      * @return array
      */
-    private function getUsedFieldtypes(array $contenttype, Content $content, array $has)
+    private function getUsedFieldtypes(array $contenttype, $content, array $has)
     {
         $fieldtypes = [
             'meta' => true
