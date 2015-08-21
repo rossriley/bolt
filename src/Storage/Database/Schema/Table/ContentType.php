@@ -27,11 +27,11 @@ class ContentType extends BaseTable
         // String, 128, not null, empty default
         'slug'           => 'columnStringNotNull',
         // Text, platform default size
-        'filelist'       => 'columnText',
-        'geolocation'    => 'columnText',
+        'filelist'       => 'columnJson',
+        'geolocation'    => 'columnJson',
         'html'           => 'columnText',
-        'image'          => 'columnText',
-        'imagelist'      => 'columnText',
+        'image'          => 'columnJson',
+        'imagelist'      => 'columnJson',
         'markdown'       => 'columnText',
         'select'         => 'columnText',
         'textarea'       => 'columnText',
@@ -200,6 +200,16 @@ class ContentType extends BaseTable
     private function columnText($fieldName)
     {
         $this->table->addColumn($fieldName, 'text', ['default' => $this->getTextDefault()]);
+    }
+    
+    /**
+     * Add a column to store json array.
+     *
+     * @param string $fieldName
+     */
+    private function columnJson($fieldName)
+    {
+        $this->table->addColumn($fieldName, 'json_array']);
     }
 
     /**
