@@ -29,6 +29,6 @@ class ContentLegacyService
             $contenttype = $this->app['storage']->getContenttype($contenttype);
         }
 
-        $this->contenttype = $contenttype;
+        $entity->contenttype = $contenttype;
     }
 }
