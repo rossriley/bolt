@@ -31,6 +31,18 @@ class Content extends Entity
     protected $status;
     protected $templatefields;
 
+    /**
+     * Getter for templates using {{ content.get(title) }} functions.
+     *
+     * @param string $key
+     *
+     * @return mixed
+     */
+    public function get($key)
+    {
+        return $this->$key;
+    }
+
     public function getDatecreated()
     {
         if (!$this->datecreated) {
@@ -58,7 +70,7 @@ class Content extends Entity
     {
         $this->_contenttype = $value;
     }
-    
+
     public function setLegacyService(ContentLegacyService $service)
     {
         $this->_legacy = $service;
