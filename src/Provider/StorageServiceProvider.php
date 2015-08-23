@@ -90,6 +90,7 @@ class StorageServiceProvider implements ServiceProviderInterface
 
         $app['storage.repositories'] = [
             'Bolt\Storage\Entity\Authtoken' => 'Bolt\Storage\Repository\AuthtokenRepository',
+            'Bolt\Storage\Entity\Content'   => 'Bolt\Storage\Repository\ContentRepository',
             'Bolt\Storage\Entity\Cron'      => 'Bolt\Storage\Repository\CronRepository',
             'Bolt\Storage\Entity\LogChange' => 'Bolt\Storage\Repository\LogChangeRepository',
             'Bolt\Storage\Entity\LogSystem' => 'Bolt\Storage\Repository\LogSystemRepository',
