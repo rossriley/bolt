@@ -340,7 +340,7 @@ class Repository implements ObjectRepository
      *
      * @return mixed
      */
-    protected function hydrate(array $data, QueryBuilder $qb)
+    protected function hydrate(array $data, QueryBuilder $qb = null)
     {
         $preArgs = new HydrationEvent(
             $data,

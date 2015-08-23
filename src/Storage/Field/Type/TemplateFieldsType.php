@@ -23,8 +23,8 @@ class TemplateFieldsType extends FieldTypeBase
         $type = $this->getStorageType();
         $value = $type->convertToPHPValue($data[$key], $em->createQueryBuilder()->getConnection()->getDatabasePlatform());
         
-        $repo = $em->getRepository(get_class($entity));
-        $templateEntity = $repo->hydrate($value);
+        $repo = $em->getRepository($entity->getContenttype());
+        $templateEntity = $repo->create($value);
 
         $entity->templatefields = $templateEntity;
     }
