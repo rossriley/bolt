@@ -11,6 +11,23 @@ use Doctrine\DBAL\Types\Type;
  */
 class TemplateFieldsType extends FieldTypeBase
 {
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function hydrate($data, $entity, EntityManager $em = null)
+    {
+        
+        $key = $this->mapping['fieldname'];
+        $type = $this->getStorageType();
+        $value = $type->convertToPHPValue($data[$key], $em->createQueryBuilder()->getConnection()->getDatabasePlatform());
+        
+        $repo = $em->getRepository(get_class($entity));
+        $templateEntity = $repo->hydrate($value);
+
+        $entity->templatefields = $templateEntity;
+    }
+    
     /**
      * {@inheritdoc}
      */

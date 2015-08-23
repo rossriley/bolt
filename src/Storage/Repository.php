@@ -55,8 +55,7 @@ class Repository implements ObjectRepository
      */
     public function create($params = null)
     {
-        $entityClass = $this->getClassName();
-        return new $entityClass($params);
+        return $this->hydrate($params);
     }
 
     /**
