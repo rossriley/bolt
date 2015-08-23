@@ -1,4 +1,5 @@
 <?php
+
 namespace Bolt\Storage\Field\Type;
 
 use Bolt\Storage\EntityManager;
@@ -12,23 +13,22 @@ use Doctrine\DBAL\Types\Type;
  */
 class TemplateFieldsType extends FieldTypeBase
 {
-    
     /**
      * {@inheritdoc}
      */
     public function hydrate($data, $entity, EntityManager $em = null)
     {
-        
         $key = $this->mapping['fieldname'];
         $type = $this->getStorageType();
         $value = $type->convertToPHPValue($data[$key], $em->createQueryBuilder()->getConnection()->getDatabasePlatform());
-        
-        $repo = $em->getRepository($entity->getContenttype());
-        $templateEntity = $repo->create($value);
 
-        $entity->templatefields = $templateEntity;
+        if ($value) {
+            $repo = $em->getRepository($entity->getContenttype());
+            $templateEntity = $repo->create($value);
+            $entity->templatefields = $templateEntity;
+        }
     }
-    
+
     /**
      * {@inheritdoc}
      */
