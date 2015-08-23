@@ -55,7 +55,7 @@ class Repository implements ObjectRepository
      */
     public function create($params = null)
     {
-        return $this->hydrate($params);
+        return $this->hydrator->hydrate($params, null, $this->em);
     }
 
     /**
