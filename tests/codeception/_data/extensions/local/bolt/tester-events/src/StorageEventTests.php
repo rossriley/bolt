@@ -43,8 +43,6 @@ class StorageEventTests
                 $record->setTeaser( $values['teaser'] . '<p>Added to teaser during PRE_SAVE on save: ' . date('Y-m-d H:i:s') . '</p>');
             }
             
-            // Save the changes to the database
-            $repo->save($record, true);
         }
     }
 
