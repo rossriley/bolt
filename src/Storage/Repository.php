@@ -327,9 +327,9 @@ class Repository implements ObjectRepository
     {
         try {
             if ( $existing = $entity->getId() ) {
-                $creating = true;
-            } else {
                 $creating = false;
+            } else {
+                $creating = true;
             }
         } catch (\Exception $e) {
             $creating = $existing = false;
