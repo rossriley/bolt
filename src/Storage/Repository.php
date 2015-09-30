@@ -350,8 +350,6 @@ class Repository implements ObjectRepository
             $this->event()->dispatch(StorageEvents::POST_SAVE, $event);
         }
         
-        $this->refresh($entity);
-
         return $response;
     }
 
