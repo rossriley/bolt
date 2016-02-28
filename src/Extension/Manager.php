@@ -11,6 +11,7 @@ use Bolt\Filesystem\Handler\JsonFile;
 use Bolt\Legacy\ExtensionsTrait;
 use Bolt\Logger\FlashLoggerInterface;
 use Bolt\Translation\LazyTranslator as Trans;
+use RuntimeException;
 use Silex\Application;
 
 /**
@@ -104,14 +105,14 @@ class Manager
      * @param string             $relativeUrl
      * @param string|null        $composerName
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      *
      * @return ResolvedExtension
      */
     public function add(ExtensionInterface $extension, DirectoryInterface $baseDir, $relativeUrl, $composerName = null)
     {
         if ($this->registered) {
-            throw new \RuntimeException('Can not add extensions after they are registered.');
+            throw new RuntimeException('Can not add extensions after they are registered.');
         }
 
         // Set paths in the extension
@@ -145,7 +146,7 @@ class Manager
     public function addManagedExtensions()
     {
         if ($this->loaded) {
-            throw new \RuntimeException('Extensions already loaded.');
+            throw new RuntimeException('Extensions already loaded.');
         }
 
         // Include the extensions autoload file
@@ -173,14 +174,25 @@ class Manager
      * Call register() for each extension.
      *
      *
-     * @param Application $app
+     * @param Application | ExtensionInterface $app
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function register(Application $app)
     {
+        if ($app instanceof ExtensionInterface) {
+            $id = $app->getId();
+            $this->extensions[$id] = new ResolvedExtension($app);
+
+            return;
+        }
+
+        if (! $app instanceof Application) {
+            throw new RuntimeException('$app must be an instance of ExtensionInterface or Silex\Application');
+        }
+
         if ($this->registered) {
-            throw new \RuntimeException('Can not re-register extensions.');
+            throw new RuntimeException('Can not re-register extensions.');
         }
         foreach ($this->extensions as $extension) {
             if ($extension->isEnabled() !== true) {
