@@ -4,6 +4,7 @@ namespace Bolt\Storage\Mapping;
 use Bolt\Storage\NamingStrategy;
 use Bolt\Storage\NamingStrategyInterface;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata as ClassMetadataInterface;
+use ReflectionClass;
 
 /**
  * Base metadata class, used to provide info from mapping configuration to Entity objects.
@@ -169,11 +170,11 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * Gets the ReflectionClass instance for this mapped class.
      *
-     * @return \ReflectionClass
+     * @return ReflectionClass
      */
     public function getReflectionClass()
     {
-        return new \ReflectionClass($this->getName());
+        return new ReflectionClass($this->getName());
     }
 
     /**
