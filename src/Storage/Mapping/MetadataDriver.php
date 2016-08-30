@@ -163,20 +163,22 @@ class MetadataDriver implements MappingDriver
         $this->metadata[$className]['table'] = $table->getName();
         $this->metadata[$className]['boltname'] = $contentKey;
         foreach ($table->getColumns() as $colName => $column) {
-            $mapping = [
-                'fieldname'        => $column->getName(),
-                'attribute'        => $this->camelize($column->getName()),
-                'type'             => $column->getType()->getName(),
-                'fieldtype'        => $this->getFieldTypeFor($table->getOption('alias'), $column),
-                'length'           => $column->getLength(),
-                'nullable'         => $column->getNotnull(),
-                'platformOptions'  => $column->getPlatformOptions(),
-                'precision'        => $column->getPrecision(),
-                'scale'            => $column->getScale(),
-                'default'          => $column->getDefault(),
-                'columnDefinition' => $column->getColumnDefinition(),
-                'autoincrement'    => $column->getAutoincrement(),
-            ];
+            $mapping = new Mapping(
+                [
+                    'fieldname'        => $column->getName(),
+                    'attribute'        => $this->camelize($column->getName()),
+                    'type'             => $column->getType()->getName(),
+                    'fieldtype'        => $this->getFieldTypeFor($table->getOption('alias'), $column),
+                    'length'           => $column->getLength(),
+                    'nullable'         => $column->getNotnull(),
+                    'platformOptions'  => $column->getPlatformOptions(),
+                    'precision'        => $column->getPrecision(),
+                    'scale'            => $column->getScale(),
+                    'default'          => $column->getDefault(),
+                    'columnDefinition' => $column->getColumnDefinition(),
+                    'autoincrement'    => $column->getAutoincrement(),
+                ]
+            );
 
             $this->metadata[$className]['fields'][$colName] = $mapping;
 
