@@ -378,8 +378,8 @@ abstract class Base implements ControllerProviderInterface
      */
     protected function getContent($textQuery, $parameters = [], &$pager = [], $whereParameters = [])
     {
-        $queryVersion = $this->getOption('general/compatibility/setcontent_version', 1);
-        if ($queryVersion == 2) {
+        $queryVersion = $this->getOption('general/compatibility/setcontent_legacy', false);
+        if ($queryVersion) {
             $params = array_merge($parameters, $whereParameters);
             return  $this->app['query']->getContent($textQuery, $params);
         }
